@@ -42,7 +42,7 @@
             <!-- Upload Section -->
             <div id="upload-section" class="mb-10">
                 <div id="drop-zone" class="border-3 border-dashed border-gray-300 rounded-2xl p-12 text-center transition-all cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 group">
-                    <input type="file" id="file-input" class="hidden" accept="image/*">
+                    <input type="file" id="file-input" class="hidden" accept="image/*" multiple>
                     <div class="space-y-4">
                         <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-100 text-indigo-600 group-hover:scale-110 transition-transform">
                             <i class="fas fa-cloud-upload-alt text-3xl"></i>
@@ -58,48 +58,20 @@
 
             <!-- Preview & Action Section -->
             <div id="process-section" class="hidden space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Original -->
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-gray-500 uppercase">Oryginał</span>
-                            <button id="reset-btn" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">Zmień zdjęcie</button>
-                        </div>
-                        <div class="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden border border-gray-200">
-                            <img id="inImg" class="w-full h-full object-contain" alt="Oryginał">
-                        </div>
-                    </div>
-
-                    <!-- Result -->
-                    <div id="result-column" class="hidden space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-gray-500 uppercase">Wynik</span>
-                            <span id="processing-status" class="text-sm font-medium text-gray-600 hidden italic">Przetwarzanie...</span>
-                        </div>
-                        <div class="relative aspect-square bg-checkerboard rounded-2xl overflow-hidden border border-gray-200 bg-[url('https://www.transparenttextures.com/patterns/checkerboard.png')]">
-                            <div id="loading-overlay" class="absolute inset-0 bg-white/80 flex flex-col items-center justify-center space-y-4 hidden">
-                                <div class="w-full max-w-[200px] bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700 overflow-hidden">
-                                    <div id="loading-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-                                </div>
-                                <p id="loading-text" class="font-medium text-indigo-600 animate-pulse">Przygotowanie...</p>
-                            </div>
-                            <img id="outImg" class="w-full h-full object-contain" alt="Wynik">
-                        </div>
-                    </div>
+                <!-- Multi-file List -->
+                <div id="file-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards will be injected here -->
                 </div>
 
-                <div class="flex flex-col items-center space-y-4 pt-4">
-                    <div id="action-buttons" class="flex flex-wrap justify-center gap-4">
-                        <button id="crop-btn" class="bg-white border-2 border-indigo-600 text-indigo-600 px-8 py-3 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all active:scale-95">
-                            <i class="fas fa-crop-alt mr-2"></i> Przytnij
+                <div id="batch-actions" class="flex flex-col items-center space-y-4 pt-8 border-t border-gray-100">
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button id="reset-all-btn" class="bg-white border-2 border-gray-300 text-gray-600 px-8 py-3 rounded-xl font-bold text-lg hover:bg-gray-50 transition-all active:scale-95">
+                            <i class="fas fa-redo mr-2"></i> Wyczyść wszystko
                         </button>
-                        <button id="process-btn" class="gradient-bg text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                            <i class="fas fa-magic mr-2"></i> Usuń tło teraz
+                        <button id="process-all-btn" class="gradient-bg text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50">
+                            <i class="fas fa-magic mr-2"></i> Usuń tło ze wszystkich
                         </button>
                     </div>
-                    <a id="download-btn" href="#" download="no-bg.png" class="hidden bg-emerald-500 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95">
-                        <i class="fas fa-download mr-2"></i> Pobierz PNG
-                    </a>
                 </div>
             </div>
 
@@ -143,29 +115,24 @@
         const fileInput = document.getElementById('file-input');
         const uploadSection = document.getElementById('upload-section');
         const processSection = document.getElementById('process-section');
-        const inImg = document.getElementById('inImg');
-        const outImg = document.getElementById('outImg');
-        const processBtn = document.getElementById('process-btn');
-        const downloadBtn = document.getElementById('download-btn');
-        const resetBtn = document.getElementById('reset-btn');
-        const loadingOverlay = document.getElementById('loading-overlay');
         const errorToast = document.getElementById('error-toast');
         const errorMsg = document.getElementById('error-msg');
         
-        // New elements
-        const resultColumn = document.getElementById('result-column');
-        const cropBtn = document.getElementById('crop-btn');
+        // New elements for batch processing
+        const fileListContainer = document.getElementById('file-list');
+        const processAllBtn = document.getElementById('process-all-btn');
+        const resetAllBtn = document.getElementById('reset-all-btn');
+
+        // Cropper elements
         const cropModal = document.getElementById('crop-modal');
         const cropImage = document.getElementById('crop-image');
         const saveCropBtn = document.getElementById('save-crop');
         const cancelCropBtn = document.getElementById('cancel-crop');
         const closeCropModalBtn = document.getElementById('close-crop-modal');
-        const loadingBar = document.getElementById('loading-bar');
-        const loadingText = document.getElementById('loading-text');
-        const actionButtons = document.getElementById('action-buttons');
 
-        let currentFile = null;
+        let filesQueue = []; // Array of objects { id, file, originalUrl, resultUrl, status, progress, cropperBlob }
         let cropper = null;
+        let currentCroppingId = null;
 
         // Trigger file input
         dropZone.addEventListener('click', () => fileInput.click());
@@ -186,9 +153,7 @@
         });
 
         dropZone.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
+            handleFiles(e.dataTransfer.files);
         });
 
         fileInput.addEventListener('change', (e) => {
@@ -197,39 +162,178 @@
 
         function handleFiles(files) {
             if (files.length === 0) return;
-            const file = files[0];
-            if (!file.type.startsWith('image/')) {
-                showError('Proszę wybrać plik graficzny.');
+            
+            const newFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+            if (newFiles.length === 0) {
+                showError('Proszę wybrać pliki graficzne.');
                 return;
             }
+
+            newFiles.forEach(file => {
+                const id = Math.random().toString(36).substr(2, 9);
+                const originalUrl = URL.createObjectURL(file);
+                filesQueue.push({
+                    id,
+                    file,
+                    originalUrl,
+                    resultUrl: null,
+                    status: 'ready', // ready, processing, done, error
+                    progress: 0,
+                    error: null
+                });
+            });
             
-            currentFile = file;
-            inImg.src = URL.createObjectURL(file);
-            outImg.src = '';
-            
+            renderFileList();
             uploadSection.classList.add('hidden');
             processSection.classList.remove('hidden');
-            resultColumn.classList.add('hidden');
-            downloadBtn.classList.add('hidden');
-            actionButtons.classList.remove('hidden');
             errorToast.classList.add('hidden');
         }
 
+        function renderFileList() {
+            fileListContainer.innerHTML = '';
+            filesQueue.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `glass-card rounded-2xl border border-gray-200 overflow-hidden flex flex-col transition-all ${item.status === 'processing' ? 'ring-2 ring-indigo-500' : ''}`;
+                
+                const isDone = item.status === 'done';
+                const isProcessing = item.status === 'processing';
+                
+                card.innerHTML = `
+                    <div class="relative aspect-square bg-gray-100 group">
+                        <img src="${isDone ? item.resultUrl : item.originalUrl}" class="w-full h-full object-contain ${isDone ? 'bg-[url(\'https://www.transparenttextures.com/patterns/checkerboard.png\')]' : ''}" id="img-${item.id}">
+                        
+                        ${isProcessing ? `
+                            <div class="absolute inset-0 bg-white/60 flex flex-col items-center justify-center p-4">
+                                <div class="w-full bg-gray-200 rounded-full h-1.5 mb-2 overflow-hidden">
+                                    <div class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300" style="width: ${item.progress}%"></div>
+                                </div>
+                                <span class="text-xs font-bold text-indigo-600 animate-pulse">${item.progress < 100 ? 'Przetwarzanie...' : 'Finalizowanie...'}</span>
+                            </div>
+                        ` : ''}
+
+                        ${item.status === 'ready' ? `
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <button onclick="openCrop('${item.id}')" class="bg-white text-gray-800 p-2 rounded-lg hover:bg-indigo-50 transition-colors shadow-lg" title="Przytnij">
+                                    <i class="fas fa-crop-alt"></i>
+                                </button>
+                                <button onclick="removeFile('${item.id}')" class="bg-white text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors shadow-lg" title="Usuń">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="p-4 flex flex-col flex-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-gray-400 uppercase truncate pr-2">${item.file.name}</span>
+                            ${isDone ? '<span class="text-emerald-500 text-xs font-bold"><i class="fas fa-check-circle"></i> GOTOWE</span>' : ''}
+                            ${item.status === 'error' ? '<span class="text-red-500 text-xs font-bold"><i class="fas fa-exclamation-circle"></i> BŁĄD</span>' : ''}
+                        </div>
+                        
+                        <div class="mt-auto pt-2">
+                            ${isDone ? `
+                                <a href="${item.resultUrl}" download="no-bg-${item.file.name.split('.')[0]}.png" class="block w-full text-center bg-emerald-500 text-white py-2 rounded-lg font-bold text-sm hover:bg-emerald-600 transition-all">
+                                    <i class="fas fa-download mr-1"></i> Pobierz
+                                </a>
+                            ` : `
+                                <button onclick="processSingle('${item.id}')" ${isProcessing ? 'disabled' : ''} class="w-full bg-indigo-50 text-indigo-600 py-2 rounded-lg font-bold text-sm hover:bg-indigo-100 transition-all disabled:opacity-50">
+                                    ${isProcessing ? 'Przetwarzanie...' : 'Usuń tło'}
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+                fileListContainer.appendChild(card);
+            });
+
+            processAllBtn.disabled = !filesQueue.some(f => f.status === 'ready');
+        }
+
+        function removeFile(id) {
+            const index = filesQueue.findIndex(f => f.id === id);
+            if (index > -1) {
+                URL.revokeObjectURL(filesQueue[index].originalUrl);
+                if (filesQueue[index].resultUrl) URL.revokeObjectURL(filesQueue[index].resultUrl);
+                filesQueue.splice(index, 1);
+                
+                if (filesQueue.length === 0) {
+                    resetAll();
+                } else {
+                    renderFileList();
+                }
+            }
+        }
+
+        function resetAll() {
+            filesQueue.forEach(f => {
+                URL.revokeObjectURL(f.originalUrl);
+                if (f.resultUrl) URL.revokeObjectURL(f.resultUrl);
+            });
+            filesQueue = [];
+            uploadSection.classList.remove('hidden');
+            processSection.classList.add('hidden');
+            fileInput.value = '';
+        }
+
+        resetAllBtn.addEventListener('click', resetAll);
+
+        async function processSingle(id) {
+            const item = filesQueue.find(f => f.id === id);
+            if (!item || item.status !== 'ready') return;
+
+            item.status = 'processing';
+            item.progress = 10;
+            renderFileList();
+
+            const formData = new FormData();
+            formData.append('file', item.file);
+
+            try {
+                const response = await fetch('/api/remove', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                item.progress = 60;
+                renderFileList();
+
+                if (!response.ok) throw new Error('Błąd serwera');
+
+                const blob = await response.blob();
+                item.resultUrl = URL.createObjectURL(blob);
+                item.status = 'done';
+                item.progress = 100;
+            } catch (err) {
+                item.status = 'error';
+                item.error = err.message;
+            }
+            renderFileList();
+        }
+
+        processAllBtn.addEventListener('click', async () => {
+            const readyItems = filesQueue.filter(f => f.status === 'ready');
+            for (const item of readyItems) {
+                await processSingle(item.id);
+            }
+        });
+
         // Cropping Logic
-        cropBtn.addEventListener('click', () => {
-            cropImage.src = inImg.src;
+        window.openCrop = function(id) {
+            const item = filesQueue.find(f => f.id === id);
+            if (!item) return;
+
+            currentCroppingId = id;
+            cropImage.src = item.originalUrl;
             cropModal.classList.remove('hidden');
             
-            if (cropper) {
-                cropper.destroy();
-            }
+            if (cropper) cropper.destroy();
             
             cropper = new Cropper(cropImage, {
                 viewMode: 2,
                 autoCropArea: 1,
                 responsive: true
             });
-        });
+        };
 
         function closeCrop() {
             cropModal.classList.add('hidden');
@@ -237,96 +341,30 @@
                 cropper.destroy();
                 cropper = null;
             }
+            currentCroppingId = null;
         }
 
         cancelCropBtn.addEventListener('click', closeCrop);
         closeCropModalBtn.addEventListener('click', closeCrop);
 
         saveCropBtn.addEventListener('click', () => {
-            if (!cropper) return;
+            if (!cropper || !currentCroppingId) return;
             
-            const canvas = cropper.getCroppedCanvas({
-                maxWidth: 4096,
-                maxHeight: 4096
-            });
+            const item = filesQueue.find(f => f.id === currentCroppingId);
+            const canvas = cropper.getCroppedCanvas({ maxWidth: 4096, maxHeight: 4096 });
             
             canvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
-                inImg.src = url;
+                URL.revokeObjectURL(item.originalUrl);
+                item.originalUrl = url;
                 
-                // Update currentFile to a new File object
-                const fileName = currentFile.name.split('.')[0] + '-cropped.png';
-                currentFile = new File([blob], fileName, { type: 'image/png' });
+                const fileName = item.file.name.split('.')[0] + '-cropped.png';
+                item.file = new File([blob], fileName, { type: 'image/png' });
                 
+                renderFileList();
                 closeCrop();
             }, 'image/png');
         });
-
-        resetBtn.addEventListener('click', () => {
-            currentFile = null;
-            uploadSection.classList.remove('hidden');
-            processSection.classList.add('hidden');
-            fileInput.value = '';
-        });
-
-        processBtn.addEventListener('click', async () => {
-            if (!currentFile) return;
-
-            resultColumn.classList.remove('hidden');
-            setLoading(true);
-            errorToast.classList.add('hidden');
-
-            const formData = new FormData();
-            formData.append('file', currentFile);
-
-            try {
-                // Simulate progress bar for better UX
-                updateLoading(10, 'Wysyłanie...');
-                
-                const response = await fetch('/api/remove', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                updateLoading(40, 'Usuwanie tła (AI)...');
-
-                if (!response.ok) {
-                    const errorData = await response.text();
-                    throw new Error(errorData || 'Wystąpił błąd podczas przetwarzania.');
-                }
-
-                updateLoading(80, 'Finalizowanie...');
-
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                
-                outImg.src = url;
-                downloadBtn.href = url;
-                
-                updateLoading(100, 'Gotowe!');
-                
-                setTimeout(() => {
-                    actionButtons.classList.add('hidden');
-                    downloadBtn.classList.remove('hidden');
-                    setLoading(false);
-                }, 500);
-
-            } catch (err) {
-                showError(err.message);
-                setLoading(false);
-            }
-        });
-
-        function setLoading(isLoading) {
-            loadingOverlay.classList.toggle('hidden', !isLoading);
-            processBtn.disabled = isLoading;
-            cropBtn.disabled = isLoading;
-        }
-
-        function updateLoading(percent, text) {
-            loadingBar.style.width = `${percent}%`;
-            if (text) loadingText.textContent = text;
-        }
 
         function showError(msg) {
             errorMsg.textContent = msg;
