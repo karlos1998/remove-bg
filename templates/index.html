@@ -235,6 +235,11 @@
                         
                         <div class="mt-auto pt-2">
                             ${isDone ? `
+                                <div class="flex gap-2 mb-2">
+                                    <button onclick="rotateResult('${item.id}')" class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg font-bold text-sm hover:bg-gray-200 transition-all">
+                                        <i class="fas fa-undo mr-1"></i> Obróć
+                                    </button>
+                                </div>
                                 <a href="${item.resultUrl}" download="no-bg-${item.file.name.split('.')[0]}.png" class="block w-full text-center bg-emerald-500 text-white py-2 rounded-lg font-bold text-sm hover:bg-emerald-600 transition-all">
                                     <i class="fas fa-download mr-1"></i> Pobierz
                                 </a>
@@ -339,6 +344,32 @@
                 const fileName = item.file.name.split('.')[0] + '-rotated.png';
                 item.file = new File([blob], fileName, { type: 'image/png' });
                 
+                renderFileList();
+            }, 'image/png');
+        }
+
+        async function rotateResult(id) {
+            const item = filesQueue.find(f => f.id === id);
+            if (!item || !item.resultUrl || item.status !== 'done') return;
+
+            const img = new Image();
+            img.src = item.resultUrl;
+            
+            await new Promise(resolve => img.onload = resolve);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = img.height;
+            canvas.height = img.width;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(-90 * Math.PI / 180); // Rotate 90 degrees left
+            ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                URL.revokeObjectURL(item.resultUrl);
+                item.resultUrl = url;
                 renderFileList();
             }, 'image/png');
         }
