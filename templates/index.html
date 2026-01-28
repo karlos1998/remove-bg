@@ -216,6 +216,9 @@
                                 <button onclick="openCrop('${item.id}')" class="bg-white text-gray-800 p-2 rounded-lg hover:bg-indigo-50 transition-colors shadow-lg" title="Przytnij">
                                     <i class="fas fa-crop-alt"></i>
                                 </button>
+                                <button onclick="rotateFile('${item.id}')" class="bg-white text-gray-800 p-2 rounded-lg hover:bg-indigo-50 transition-colors shadow-lg" title="Obróć">
+                                    <i class="fas fa-undo"></i>
+                                </button>
                                 <button onclick="removeFile('${item.id}')" class="bg-white text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors shadow-lg" title="Usuń">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
@@ -308,6 +311,36 @@
                 item.error = err.message;
             }
             renderFileList();
+        }
+
+        async function rotateFile(id) {
+            const item = filesQueue.find(f => f.id === id);
+            if (!item || item.status !== 'ready') return;
+
+            const img = new Image();
+            img.src = item.originalUrl;
+            
+            await new Promise(resolve => img.onload = resolve);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = img.height;
+            canvas.height = img.width;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(-90 * Math.PI / 180); // Rotate 90 degrees left (counter-clockwise)
+            ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                URL.revokeObjectURL(item.originalUrl);
+                item.originalUrl = url;
+                
+                const fileName = item.file.name.split('.')[0] + '-rotated.png';
+                item.file = new File([blob], fileName, { type: 'image/png' });
+                
+                renderFileList();
+            }, 'image/png');
         }
 
         processAllBtn.addEventListener('click', async () => {
