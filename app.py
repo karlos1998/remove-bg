@@ -10,7 +10,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# Inicjalizacja sesji z modelem birefnet-general, który oferuje najwyższą precyzję detali
+# Initialize session with the birefnet-general model, which offers the highest detail precision
 session = new_session("birefnet-general")
 
 @app.get("/", response_class=HTMLResponse)
@@ -20,22 +20,22 @@ async def index(request: Request):
 @app.post("/api/remove")
 async def remove_bg(file: UploadFile = File(...)):
     if not file.content_type or not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=415, detail="Wyślij plik graficzny")
+        raise HTTPException(status_code=415, detail="Please upload an image file")
 
     data = await file.read()
     if not data:
-        raise HTTPException(status_code=400, detail="Pusty plik")
+        raise HTTPException(status_code=400, detail="Empty file")
 
     try:
-        # Rezygnujemy z alpha_matting na rzecz potężniejszego modelu birefnet
-        # Model ten świetnie radzi sobie z wycinaniem tła wewnątrz pętli i pasków
+        # We forgo alpha_matting in favor of the more powerful birefnet model
+        # This model excels at cutting out the background inside loops and straps
         out = remove(
             data,
             session=session,
             alpha_matting=False
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Nie udało się usunąć tła: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to remove background: {e}")
 
     return Response(
         content=out,

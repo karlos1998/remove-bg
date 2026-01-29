@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BG Remover Pro | Profesjonalne Usuwanie Tła</title>
+    <title>BG Remover Pro | Professional Background Removal</title>
     
     <!-- Scripts & Styles -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -36,8 +36,8 @@
                 BG Remover <span class="text-indigo-200">Pro</span>
             </h1>
             <p class="text-xl md:text-2xl opacity-90 font-medium max-w-2xl mx-auto leading-relaxed">
-                Precyzyjne usuwanie tła z Twoich zdjęć. 
-                <span class="block text-indigo-100/70 text-sm mt-4 font-normal">Prywatnie, lokalnie, bez limitów.</span>
+                Precise background removal for your photos. 
+                <span class="block text-indigo-100/70 text-sm mt-4 font-normal">Private, local, no limits.</span>
             </p>
         </div>
     </header>
@@ -54,8 +54,8 @@
                             <i class="fas fa-images text-4xl"></i>
                         </div>
                         <div>
-                            <p class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-2">Wrzuć swoje zdjęcia</p>
-                            <p class="text-slate-500 font-medium">Przeciągnij i upuść lub kliknij, aby przeglądać</p>
+                            <p class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-2">Upload your photos</p>
+                            <p class="text-slate-500 font-medium">Drag and drop or click to browse</p>
                         </div>
                         <div class="flex flex-wrap justify-center gap-2 pt-4">
                             <span class="px-3 py-1 bg-white rounded-lg text-[10px] font-bold text-slate-400 border border-slate-100 shadow-sm uppercase tracking-tighter">PNG</span>
@@ -77,10 +77,10 @@
                 <div id="batch-actions" class="flex flex-col items-center pt-10 border-t border-slate-100">
                     <div class="flex flex-wrap justify-center gap-4">
                         <button id="reset-all-btn" class="bg-slate-100 text-slate-600 px-8 py-4 rounded-2xl font-bold text-sm hover:bg-slate-200 transition-all flex items-center">
-                            <i class="fas fa-trash-alt mr-2"></i> Wyczyść listę
+                            <i class="fas fa-trash-alt mr-2"></i> Clear list
                         </button>
                         <button id="process-all-btn" class="bg-indigo-600 text-white px-12 py-4 rounded-2xl font-black text-sm shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-1 transition-all flex items-center disabled:opacity-50">
-                            <i class="fas fa-wand-magic-sparkles mr-2 text-indigo-300"></i> WYCZYŚĆ WSZYSTKIE TŁA
+                            <i class="fas fa-wand-magic-sparkles mr-2 text-indigo-300"></i> REMOVE ALL BACKGROUNDS
                         </button>
                     </div>
                 </div>
@@ -91,8 +91,8 @@
                 <div class="bg-white rounded-[2rem] w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-white/20">
                     <div class="p-6 border-b flex justify-between items-center bg-slate-50/50">
                         <div>
-                            <h3 class="text-xl font-bold text-slate-800">Dostosuj kadr</h3>
-                            <p class="text-xs text-slate-500 font-medium">Ustaw obszar, który chcesz zachować</p>
+                            <h3 class="text-xl font-bold text-slate-800">Adjust crop</h3>
+                            <p class="text-xs text-slate-500 font-medium">Set the area you want to keep</p>
                         </div>
                         <button id="close-crop-modal" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-all">
                             <i class="fas fa-times text-lg"></i>
@@ -104,8 +104,8 @@
                         </div>
                     </div>
                     <div class="p-6 border-t flex justify-end gap-3 bg-slate-50/50">
-                        <button id="cancel-crop" class="px-6 py-3 text-slate-600 font-bold text-sm hover:bg-slate-200/50 rounded-xl transition-all">Anuluj</button>
-                        <button id="save-crop" class="px-10 py-3 bg-indigo-600 text-white font-black text-sm rounded-xl shadow-lg hover:bg-indigo-700 transition-all">Zastosuj zmiany</button>
+                        <button id="cancel-crop" class="px-6 py-3 text-slate-600 font-bold text-sm hover:bg-slate-200/50 rounded-xl transition-all">Cancel</button>
+                        <button id="save-crop" class="px-10 py-3 bg-indigo-600 text-white font-black text-sm rounded-xl shadow-lg hover:bg-indigo-700 transition-all">Apply changes</button>
                     </div>
                 </div>
             </div>
@@ -117,7 +117,7 @@
                         <i class="fas fa-triangle-exclamation"></i>
                     </div>
                     <div>
-                        <p class="font-bold text-sm uppercase tracking-wider">Wystąpił problem</p>
+                        <p class="font-bold text-sm uppercase tracking-wider">A problem occurred</p>
                         <p id="error-msg" class="text-sm opacity-80 font-medium"></p>
                     </div>
                 </div>
@@ -132,7 +132,7 @@
                     <i class="fab fa-github opacity-30 hover:opacity-100 cursor-pointer transition-opacity"></i>
                     <i class="fas fa-shield-halved opacity-30 hover:opacity-100 cursor-pointer transition-opacity"></i>
                 </div>
-                <p class="text-xs font-bold uppercase tracking-widest">&copy; 2026 BG Remover Pro &bull; Prywatność przede wszystkim</p>
+                <p class="text-xs font-bold uppercase tracking-widest">&copy; 2026 BG Remover Pro &bull; Privacy first</p>
             </div>
         </div>
     </footer>

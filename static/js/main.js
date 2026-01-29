@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const newFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
         if (newFiles.length === 0) {
-            showError('Proszę wybrać pliki graficzne.');
+            showError('Please select image files.');
             return;
         }
 
@@ -106,19 +106,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${isProcessing ? `
                         <div class="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center p-6">
                             <div class="spinner mb-4"></div>
-                            <span class="text-xs font-bold text-indigo-600 tracking-wider uppercase">Usuwanie tła...</span>
+                            <span class="text-xs font-bold text-indigo-600 tracking-wider uppercase">Removing background...</span>
                         </div>
                     ` : ''}
 
                     ${item.status === 'ready' ? `
                         <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-3">
-                            <button onclick="window.ui.openCrop('${item.id}')" class="bg-white text-slate-800 w-10 h-10 rounded-full flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all shadow-xl" title="Przytnij">
+                            <button onclick="window.ui.openCrop('${item.id}')" class="bg-white text-slate-800 w-10 h-10 rounded-full flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all shadow-xl" title="Crop">
                                 <i class="fas fa-crop-alt"></i>
                             </button>
-                            <button onclick="window.ui.rotateFile('${item.id}')" class="bg-white text-slate-800 w-10 h-10 rounded-full flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all shadow-xl" title="Obróć">
+                            <button onclick="window.ui.rotateFile('${item.id}')" class="bg-white text-slate-800 w-10 h-10 rounded-full flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all shadow-xl" title="Rotate">
                                 <i class="fas fa-redo"></i>
                             </button>
-                            <button onclick="window.ui.removeFile('${item.id}')" class="bg-white text-red-500 w-10 h-10 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-xl" title="Usuń">
+                            <button onclick="window.ui.removeFile('${item.id}')" class="bg-white text-red-500 w-10 h-10 rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-xl" title="Remove">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
@@ -128,23 +128,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="p-4 flex flex-col flex-1">
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest truncate max-w-[150px]">${item.file.name}</span>
-                        ${isDone ? '<span class="flex items-center text-emerald-600 text-[10px] font-black tracking-tighter"><i class="fas fa-check-circle mr-1"></i> GOTOWE</span>' : ''}
-                        ${item.status === 'error' ? '<span class="flex items-center text-red-500 text-[10px] font-black tracking-tighter"><i class="fas fa-exclamation-circle mr-1"></i> BŁĄD</span>' : ''}
+                        ${isDone ? '<span class="flex items-center text-emerald-600 text-[10px] font-black tracking-tighter"><i class="fas fa-check-circle mr-1"></i> DONE</span>' : ''}
+                        ${item.status === 'error' ? '<span class="flex items-center text-red-500 text-[10px] font-black tracking-tighter"><i class="fas fa-exclamation-circle mr-1"></i> ERROR</span>' : ''}
                     </div>
                     
                     <div class="mt-auto space-y-2">
                         ${isDone ? `
                             <div class="flex gap-2">
                                 <button onclick="window.ui.rotateResult('${item.id}')" class="flex-1 bg-slate-100 text-slate-700 py-2 rounded-xl font-bold text-xs hover:bg-slate-200 transition-all">
-                                    <i class="fas fa-redo mr-1"></i> Obróć
+                                    <i class="fas fa-redo mr-1"></i> Rotate
                                 </button>
                                 <a href="${item.resultUrl}" download="no-bg-${item.file.name.split('.')[0]}.png" class="flex-[2] text-center bg-indigo-600 text-white py-2 rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all shadow-md">
-                                    <i class="fas fa-download mr-1"></i> Pobierz
+                                    <i class="fas fa-download mr-1"></i> Download
                                 </a>
                             </div>
                         ` : `
                             <button onclick="window.ui.processSingle('${item.id}')" ${isProcessing ? 'disabled' : ''} class="w-full bg-slate-900 text-white py-2.5 rounded-xl font-bold text-xs hover:bg-slate-800 transition-all disabled:opacity-50">
-                                ${isProcessing ? 'Przetwarzanie...' : 'Usuń tło'}
+                                ${isProcessing ? 'Processing...' : 'Remove background'}
                             </button>
                         `}
                     </div>
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData
             });
 
-            if (!response.ok) throw new Error('Błąd serwera');
+            if (!response.ok) throw new Error('Server error');
 
             const blob = await response.blob();
             item.resultUrl = URL.createObjectURL(blob);
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             item.status = 'error';
             item.error = err.message;
-            showError(`Błąd przy przetwarzaniu ${item.file.name}: ${err.message}`);
+            showError(`Error processing ${item.file.name}: ${err.message}`);
         }
         renderFileList();
     }
