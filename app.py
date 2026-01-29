@@ -10,8 +10,8 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-# Inicjalizacja sesji z lepszym modelem (isnet-general-use jest zazwyczaj dokładniejszy niż u2net)
-session = new_session("isnet-general-use")
+# Inicjalizacja sesji z modelem birefnet-general, który oferuje najwyższą precyzję detali
+session = new_session("birefnet-general")
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -27,14 +27,12 @@ async def remove_bg(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="Pusty plik")
 
     try:
-        # Używamy sesji i parametrów alpha_matting dla lepszych krawędzi
+        # Rezygnujemy z alpha_matting na rzecz potężniejszego modelu birefnet
+        # Model ten świetnie radzi sobie z wycinaniem tła wewnątrz pętli i pasków
         out = remove(
             data,
             session=session,
-            alpha_matting=True,
-            alpha_matting_foreground_threshold=240,
-            alpha_matting_background_threshold=10,
-            alpha_matting_erode_size=10
+            alpha_matting=False
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Nie udało się usunąć tła: {e}")
