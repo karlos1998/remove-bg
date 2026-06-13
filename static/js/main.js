@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileListContainer = document.getElementById('file-list');
     const processAllBtn = document.getElementById('process-all-btn');
     const resetAllBtn = document.getElementById('reset-all-btn');
+    const centerObjectCheckbox = document.getElementById('center-object-checkbox');
+    const centerObjectStorageKey = 'bg-remover-center-object';
 
     // Cropper elements
     const cropModal = document.getElementById('crop-modal');
@@ -20,6 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let filesQueue = []; 
     let cropper = null;
     let currentCroppingId = null;
+
+    if (centerObjectCheckbox) {
+        centerObjectCheckbox.checked = localStorage.getItem(centerObjectStorageKey) === 'true';
+        centerObjectCheckbox.addEventListener('change', () => {
+            localStorage.setItem(centerObjectStorageKey, centerObjectCheckbox.checked ? 'true' : 'false');
+        });
+    }
 
     // Event Listeners
     if (dropZone) {
@@ -167,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData();
         formData.append('file', item.file);
+        formData.append('center_object', centerObjectCheckbox?.checked ? 'true' : 'false');
 
         try {
             const response = await fetch('/api/remove', {
